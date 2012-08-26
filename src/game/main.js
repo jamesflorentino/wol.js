@@ -44,7 +44,8 @@ define([
             this.terrain = wol.create.bitmap(wol.resources.get(URI_TERRAIN));
             this.add(this.background);
             this.add(this.terrain);
-            this.grid.generate(9,8);
+            //this.grid.generate(9,8);
+            return;
             this.createStaticGridDisplay(this.grid);
             wol.tween.get(this.terrain).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
             wol.tween.get(this.hexContainer).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
