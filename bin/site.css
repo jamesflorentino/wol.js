@@ -1,9 +1,24 @@
 body {
     background: #222;
     margin: 0; padding: 0;
-}
+    }
 
 #game {
     background: #111;
     position: absolute;
-}
+    }
+
+
+#ui {
+    background: rgba(1,1,1,0.4);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: none;
+
+    }
+
+    #ui .preloader {
+        background: #111;
+    }

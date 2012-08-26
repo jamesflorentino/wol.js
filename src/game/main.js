@@ -26,8 +26,8 @@ define([
 
         settings: {
             hex: {
-                width: 0,
-                height: 0
+                width: 84,
+                height: 56
             }
         },
 
@@ -36,7 +36,7 @@ define([
         // basic display elements
         background: null,
         terrain: null,
-        hexContainer: null,
+        hexContainer: wol.create.container(),
 
         init: function() {
             this.parent();
@@ -44,25 +44,22 @@ define([
             this.terrain = wol.create.bitmap(wol.resources.get(URI_TERRAIN));
             this.add(this.background);
             this.add(this.terrain);
-            this.grid.generate(7,7);
+            this.grid.generate(9,8);
             this.createStaticGridDisplay(this.grid);
-            wol.tween.get(this.hexContainer)
-                .to({y: 400}, 15000, wol.ease.quartOut);
-            wol.play();
+            wol.tween.get(this.terrain).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
+            wol.tween.get(this.hexContainer).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
         },
 
         createStaticGridDisplay: function(grid) {
             var i, _len, tile, hex, image, container, _this = this;
             image = wol.spritesheets.extract('elements','hex_bg');
-            container = wol.create.container();
-            this.settings.hex.width = image.width;
-            this.settings.hex.height = image.height;
-            // generate
+            i = 0;
             this.createTiles(this.grid.tiles, 'hex_bg', function(hex) {
-                _this.add(container, hex);
+                _this.add(_this.hexContainer, hex);
             });
-            wol.create.cache(container, wol.width, wol.height);
-            this.hexContainer = container;
+            wol.wait(0, function(){
+                wol.create.cache(this.hexContainer, wol.width, wol.height);
+            }.bind(this));
             this.add(this.hexContainer);
         },
 

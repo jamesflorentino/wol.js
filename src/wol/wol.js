@@ -52,7 +52,7 @@ define([
                 wol.debug('displayObject id: ' + displayObject.id + ' CACHING', width, height);
                 if (displayObject.cache) {
                     displayObject.cache(0, 0, width, height);
-                    wol.debug('displayObject id: ' + displayObject.id + ' CACHED');
+                    wol.debug('displayObject id: ' + displayObject.id + ' CACHED', displayObject);
                 }
                 return this;
             }
@@ -60,7 +60,8 @@ define([
 
         events: new Events(),
         Events: {
-            READY: 'wol.ready'
+            READY: 'wol.ready',
+            PRELOAD_PROGRESS: 'wol.preload.progress'
         },
 
         spritesheets: {
@@ -119,6 +120,9 @@ define([
                 return this.loader.getResult(idOrUrl).result;
             },
             preload: function (callback) {
+                this.loader.onProgress = function() {
+                    wol.events.emit(wol.Events.PRELOAD_PROGRESS, this.loader.progress);
+                }.bind(this);
                 this.loader.onComplete = callback;
                 this.loader.loadManifest(this.manifest);
             }
@@ -143,29 +147,26 @@ define([
             createjs.Ticker.useRAF = true;
             createjs.Ticker.setFPS(30);
             createjs.Ticker.addListener(this.update.bind(this));
+            this.makeLoaderBar();
             // set the dom events
             this.setDomEvents();
-            // momentarily pause the game until we have things ready.
-            this.pause();
             // start preloading the assets in the manifest and assign
             // a callback.
             wol.debug('preload START');
             this.resources.preload(function() {
                 wol.debug('preload FINISHED');
                 wol.events.emit(wol.Events.READY, wol);
-                wait(1, function(){
-                    wol.debug('game STARTING');
-                    var game = new gameClass();
-                });
+                var game = new gameClass();
             });
+        },
+        // create preloader
+        makeLoaderBar: function(){
         },
         ready: function(callback) {
             wol.events.on(wol.Events.READY, callback);
         },
         update: function () {
-            if (!this.paused) {
-                this.stage.update();
-            }
+            this.stage.update();
         },
         pause: function () {
             createjs.Ticker.setPaused(true);
@@ -194,7 +195,8 @@ define([
         },
 
         isFunction: isFunction,
-        isArray: isArray
+        isArray: isArray,
+        wait: wait
 
     };
 

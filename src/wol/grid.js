@@ -14,7 +14,7 @@ define([
         tiles: [],
         init: function() {
         },
-        generate: function(rows, columns) {
+        generate: function(columns, rows) {
             var row, col, tile;
             this.columns = columns;
             this.rows = rows;
