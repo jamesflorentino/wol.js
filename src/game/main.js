@@ -23,7 +23,7 @@ define([
     });
 
     return Game.extend({
-        
+
         settings: {
             hex: {
                 width: 0,
@@ -44,7 +44,7 @@ define([
             this.terrain = wol.create.bitmap(wol.resources.get(URI_TERRAIN));
             this.add(this.background);
             this.add(this.terrain);
-            this.grid.generate(5,5);
+            this.grid.generate(7,7);
             this.createStaticGridDisplay(this.grid);
             wol.tween.get(this.hexContainer)
                 .to({y: 400}, 15000, wol.ease.quartOut);
