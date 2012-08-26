@@ -4,3 +4,4 @@ import.build:
 	git rm -rf bin
 	git add .
 	git commit -am "updated gh-pages"
+	git checkout master
