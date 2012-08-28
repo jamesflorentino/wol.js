@@ -9,13 +9,13 @@ define([
     return (function() {
 
         function Events() {
-            this.events = {};
+            this.__events = {};
         }
 
         Events.prototype.on = function(eventName, callback) {
-            this.events[eventName] || (this.events[eventName] = []);
+            this.__events[eventName] || (this.__events[eventName] = []);
             if(isFunction(callback)) {
-                this.events[eventName].push(callback);
+                this.__events[eventName].push(callback);
             }
             return this;
         };
@@ -23,10 +23,10 @@ define([
         Events.prototype.off = function(eventName, callback) {
             var callbacks;
             if (eventName === undefined) {
-                this.events = {};
+                this.__events = {};
             } else if (!isFunction(callback)) {
-                this.events[eventName] = [];
-            } else if (callbacks = this.events[name]) {
+                this.__events[eventName] = [];
+            } else if (callbacks = this.__events[name]) {
                 callbacks.splice(callbacks.indexOf(callback), 1);
             }
             return this;
@@ -34,7 +34,7 @@ define([
 
         Events.prototype.emit = function(eventName, data) {
             var callbacks, callback, i;
-            callbacks = this.events[eventName]
+            callbacks = this.__events[eventName]
             if (isArray(callbacks)) {
                 for(i=0; i<callbacks.length; i++) {
                     callback = callbacks[i];

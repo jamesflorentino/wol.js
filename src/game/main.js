@@ -3,33 +3,27 @@ define([
     'wol/wol',
     'wol/game',
     'wol/grid',
-    'game/textures/elements'
+    'game/textures/elements',
+    'game/entities/marine',
+    'game/hex',
+    'game/components/hexgrid'
 
-], function(wol, Game, Grid, elements) {
+], function(wol, Game, Grid, elements, Marine, Hex, hexgridComponent) {
     "use strict";
 
     var URI_BACKGROUND = 'media/background.png';
     var URI_TERRAIN = 'media/terrain.png';
-    var URI_ELEMENTS = 'media/elements.png';
 
+    // Include assets to the imageQuee
     wol.resources.add(
         URI_BACKGROUND,
-        URI_TERRAIN,
-        URI_ELEMENTS
+        URI_TERRAIN
     );
 
-    wol.ready(function(wol) {
-        wol.spritesheets.add('elements', elements);
-    });
+    // Include the elements sprite sheet
+    wol.spritesheets.add('elements', elements);
 
     return Game.extend({
-
-        settings: {
-            hex: {
-                width: 84,
-                height: 56
-            }
-        },
 
         grid: new Grid(),
 
@@ -37,6 +31,7 @@ define([
         background: null,
         terrain: null,
         hexContainer: wol.create.container(),
+        unitContainer: wol.create.container(),
 
         init: function() {
             this.parent();
@@ -44,11 +39,12 @@ define([
             this.terrain = wol.create.bitmap(wol.resources.get(URI_TERRAIN));
             this.add(this.background);
             this.add(this.terrain);
-            //this.grid.generate(9,8);
-            return;
+            this.add(this.hexContainer);
+            this.add(this.unitContainer);
+            this.grid.generate(9,8);
             this.createStaticGridDisplay(this.grid);
-            wol.tween.get(this.terrain).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
-            wol.tween.get(this.hexContainer).wait(1000).to({ y: 100 }, 2000, wol.ease.cubicInOut);
+            this.testUnits();
+            this.terrain.y = this.hexContainer.y = this.unitContainer.y = 100;
         },
 
         createStaticGridDisplay: function(grid) {
@@ -58,30 +54,52 @@ define([
             this.createTiles(this.grid.tiles, 'hex_bg', function(hex) {
                 _this.add(_this.hexContainer, hex);
             });
+            // Cache the hexTile container.
+            // We wait for a tick before we cache it. Because sometimes
+            // Chrome fails to render on initial load.
             wol.wait(0, function(){
                 wol.create.cache(this.hexContainer, wol.width, wol.height);
             }.bind(this));
-            this.add(this.hexContainer);
         },
 
         createTiles: function(tiles, type, callback) {
-            var image, hex, tile, hexes, hexWidth, hexHeight;
+            var image, hex, tile, hexes;
             type || (type = 'hex_select');
             image = wol.spritesheets.extract('elements', type);
             hexes = [];
-            hexWidth = this.settings.hex.width;
-            hexHeight = this.settings.hex.height;
             for (var i = tiles.length - 1; i >= 0; i--){
                 tile = tiles[i];
                 hex = wol.create.bitmap(image);
-                hex.x = tile.x * hexWidth + (tile.y % 2 ? hexWidth * 0.5 : 0);
-                hex.y = tile.y * (hexHeight - hexHeight * 0.25);
+                Hex.position(hex, tile);
                 if (wol.isFunction(callback)) {
                     callback.call(this, hex);
                 }
             }
             return hexes;
+        },
+
+        testUnits: function () {
+            // create the unit
+            var marine = new Marine();
+            // add components
+            // marine.component(wol.components.hexgrid);
+            // marine.component(wol.components.events);
+            // move testing
+            //marine.move(this.grid.get(1, 0));
+            //wol.wait(1000, function() {
+            //    marine.move([
+            //        this.grid.get(0,0),
+            //        this.grid.get(1,0),
+            //        this.grid.get(1,1),
+            //        this.grid.get(1,2),
+            //        this.grid.get(1,3),
+            //        this.grid.get(1,4)
+            //    ]);
+            //}.bind(this));
+            // add to display list
+            this.add(this.unitContainer, marine.container);
         }
+
     });
 
 });
