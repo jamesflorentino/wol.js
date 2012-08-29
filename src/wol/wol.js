@@ -35,20 +35,15 @@ define([
 
     wol = {
         components: {
-            events: function(entity) {
-                this.name = 'wol.components.events';
-                entity.events = new Events();
+            _dictionary: {},
+            add: function(name, component) {
+                if(!this._dictionary[name]) {
+                    this._dictionary[name] = component;
+                }
+                return this;;w
             },
-            animation: function(entity, spritesheet) {
-                this.name = 'wol.components.animation';
-                var animation = wol.create.animation(spritesheet);
-                entity.container.addChild(animation);
-                entity.play = function(frame) {
-                    animation.gotoAndPlay.apply(animation, arguments);
-                };
-                entity.stop = function(frame) {
-                    animation.gotoAndStop.apply(this, arguments);
-                };
+            get: function(name) {
+                return this._dictionary[name];
             }
         },
         display: {

@@ -8,7 +8,7 @@ define([
 
     return (function() {
 
-        function Events() {
+        function Events(entity) {
             this.__events = {};
         }
 

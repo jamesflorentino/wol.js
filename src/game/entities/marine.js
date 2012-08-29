@@ -24,16 +24,28 @@ define([
     return wol.Entity.extend({
 
         init: function() {
+            var _this = this;
             this.parent();
-            this.component(wol.components.events)
-                .component(
-                    wol.components.animation,
-                    wol.spritesheets.get(SHEET_NAME)
-                )
+            this.addComponent('spritesheet', wol.spritesheets.get(SHEET_NAME));
+            this.addComponent('events');
+            this.sequence('moveStart', 'move');
+            this.sequence('moveEnd', 'idle');
             this.play('idle');
-            this.events.on('hex.move.start', function(){
-                console.log('heeey');
+            this.on('hex.move.start', function(){
+                _this.play('moveStart');
             });
+            this.on('hex.move.end', function() {
+                _this.play('moveEnd');
+            });
+            //this.component(wol.components.events)
+            //    .component(
+            //        wol.components.animation,
+            //        wol.spritesheets.get(SHEET_NAME)
+            //    )
+            //this.play('idle');
+            //this.events.on('hex.move.start', function(){
+            //    console.log('heeey');
+            //});
         }
     });
 });

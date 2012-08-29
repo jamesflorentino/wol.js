@@ -8,7 +8,7 @@ define([
     'game/hex',
     'game/components/hexgrid'
 
-], function(wol, Game, Grid, elements, Marine, Hex, hexgridComponent) {
+], function(wol, Game, Grid, elements, Marine, Hex) {
     "use strict";
 
     var URI_BACKGROUND = 'media/background.png';
@@ -81,21 +81,18 @@ define([
         testUnits: function () {
             // create the unit
             var marine = new Marine();
-            // add components
-            // marine.component(wol.components.hexgrid);
-            // marine.component(wol.components.events);
-            // move testing
-            //marine.move(this.grid.get(1, 0));
-            //wol.wait(1000, function() {
-            //    marine.move([
-            //        this.grid.get(0,0),
-            //        this.grid.get(1,0),
-            //        this.grid.get(1,1),
-            //        this.grid.get(1,2),
-            //        this.grid.get(1,3),
-            //        this.grid.get(1,4)
-            //    ]);
-            //}.bind(this));
+            marine.addComponent('hexgrid');
+            marine.move(this.grid.get(1, 0));
+            wol.wait(1000, function() {
+                marine.move([
+                    this.grid.get(0,0),
+                    this.grid.get(1,0),
+                    this.grid.get(1,1),
+                    this.grid.get(1,2),
+                    this.grid.get(1,3),
+                    this.grid.get(1,4)
+                ]);
+            }.bind(this));
             // add to display list
             this.add(this.unitContainer, marine.container);
         }
