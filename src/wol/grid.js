@@ -22,8 +22,7 @@ define([
             // _private_
             this._keys = {};
             // ### grid._tiles
-            // _private_
-            this._tiles = [];
+            this.tiles = [];
         },
         // ### grid.generate(columns, rows)
         // Populates the grid with tile data
@@ -36,13 +35,16 @@ define([
                 for(row = 0; row < rows; row++) {
                     tile = new Tile(col, row);
                     this._keys[col][row] = tile;
-                    this._tiles.push(tile);
+                    this.tiles.push(tile);
                 }
             }
         },
         // ### grid.get(x,y)
         // A function to get a tile reference in the grid.
         get: function(x, y) {
+            if (!this._keys[x]) {
+                return null;
+            }
             return this._keys[x][y];
         }
     });

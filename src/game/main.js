@@ -2,14 +2,15 @@ define([
 
     'wol/wol',
     'wol/game',
-    'wol/grid',
+    'game/hexgrid',
     'game/textures/elements',
     'game/entities/marine',
     'game/hex',
     'game/components/hexgrid',
     'wol/keys'
 
-], function(wol, Game, Grid, elements, Marine, Hex) {
+], function(wol, Game, HexGrid, elements, Marine, Hex) {
+
     "use strict";
 
     var URI_BACKGROUND = 'media/background.png';
@@ -26,7 +27,7 @@ define([
 
     return Game.extend({
 
-        grid: new Grid(),
+        hexgrid: new HexGrid(),
 
         // basic display elements
         background: null,
@@ -42,8 +43,8 @@ define([
             this.add(this.terrain);
             this.add(this.hexContainer);
             this.add(this.unitContainer);
-            this.grid.generate(9,8);
-            this.createStaticGridDisplay(this.grid);
+            this.hexgrid.generate(9,8);
+            this.createStaticGridDisplay(this.hexgrid);
             this.testUnits();
             this.terrain.y = this.hexContainer.y = this.unitContainer.y = 60;
         },
@@ -52,7 +53,7 @@ define([
             var i, _len, tile, hex, image, container, _this = this;
             image = wol.spritesheets.extract('elements','hex_bg');
             i = 0;
-            this.createTiles(this.grid.tiles, 'hex_bg', function(hex) {
+            this.showTiles(this.hexgrid.tiles, 'hex_bg', function(hex) {
                 _this.add(_this.hexContainer, hex);
             });
             // Cache the hexTile container.
@@ -63,7 +64,7 @@ define([
             }.bind(this));
         },
 
-        createTiles: function(tiles, type, callback) {
+        showTiles: function(tiles, type, callback) {
             var image, hex, tile, hexes;
             type || (type = 'hex_select');
             image = wol.spritesheets.extract('elements', type);
@@ -87,7 +88,11 @@ define([
             // adding a unit to the display list.
             this.addEntity(entity);
             // place a unit immediately in a tile.
-            entity.move(_this.grid.get(1, 0));
+            entity.move(_this.hexgrid.get(5, 3));
+            // showing movable tiles.
+            this.showTiles(this.hexgrid.neighbors(entity.tile, 2), 'hex_select', function(hex){
+                _this.add(_this.hexContainer, hex);
+            });
         },
 
         // This command will add the unit/entity into the proper container

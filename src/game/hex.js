@@ -21,6 +21,8 @@ define([
                 y: tile.y * (this.HEIGHT - this.HEIGHT * 0.25) + (center ? this.HEIGHT * 0.5 : 0)
             };
         }
-    }
+    };
+
+
 
 });
