@@ -24,6 +24,7 @@ define([
             if( fromA = animation.spriteSheet.getAnimation(from)) {
                 fromA.next = to;
             }
+            return entity;
         }
     });
 
@@ -43,6 +44,7 @@ define([
 
     return wol.Entity = wol.Class.extend({
         init: function() {
+            this._components = [];
             // create a fresh container
             this.container = wol.create.container();
             // add the container to the main display list;
@@ -54,7 +56,6 @@ define([
             //this.container.scaleX = direction === this.LEFT ? -1 : 1;
             this.container.scaleX = Math.random() > 0.5 ? -1 : 1;
         },
-        _components: [],
         addComponent: function(name) {
             var component, args;
             if (this._components.indexOf(name) > -1) {

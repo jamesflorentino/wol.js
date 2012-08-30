@@ -6,7 +6,8 @@ define([
     'game/textures/elements',
     'game/entities/marine',
     'game/hex',
-    'game/components/hexgrid'
+    'game/components/hexgrid',
+    'wol/keys'
 
 ], function(wol, Game, Grid, elements, Marine, Hex) {
     "use strict";
@@ -44,7 +45,7 @@ define([
             this.grid.generate(9,8);
             this.createStaticGridDisplay(this.grid);
             this.testUnits();
-            this.terrain.y = this.hexContainer.y = this.unitContainer.y = 100;
+            this.terrain.y = this.hexContainer.y = this.unitContainer.y = 60;
         },
 
         createStaticGridDisplay: function(grid) {
@@ -80,21 +81,22 @@ define([
 
         testUnits: function () {
             // create the unit
-            var marine = new Marine();
-            marine.addComponent('hexgrid');
-            marine.move(this.grid.get(1, 0));
-            wol.wait(1000, function() {
-                marine.move([
-                    this.grid.get(0,0),
-                    this.grid.get(1,0),
-                    this.grid.get(1,1),
-                    this.grid.get(1,2),
-                    this.grid.get(1,3),
-                    this.grid.get(1,4)
-                ]);
-            }.bind(this));
-            // add to display list
-            this.add(this.unitContainer, marine.container);
+            var _this = this;
+            var entity;
+            entity = new Marine();
+            // adding a unit to the display list.
+            this.addEntity(entity);
+            // place a unit immediately in a tile.
+            entity.move(_this.grid.get(1, 0));
+        },
+
+        // This command will add the unit/entity into the proper container
+        // and assign the required components the entitiy needs to posess.
+        addEntity: function(entity) {
+            // since this is a hex-grid game, we should apply a hexgrid component
+            // to the entities we add into the display list.
+            entity.addComponent('hexgrid');
+            this.add(this.unitContainer, entity.container);
         }
 
     });

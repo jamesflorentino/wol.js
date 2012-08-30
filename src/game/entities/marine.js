@@ -2,7 +2,8 @@ define([
 
     'wol/wol',
     'wol/entity',
-    'game/textures/marine'
+    'game/textures/marine',
+    'game/components/hexgrid'
 
 ], function(wol, Entity, marine) {
     "use strict";
@@ -24,28 +25,31 @@ define([
     return wol.Entity.extend({
 
         init: function() {
-            var _this = this;
             this.parent();
+            var _this = this;
+            // add spriteshsetes
             this.addComponent('spritesheet', wol.spritesheets.get(SHEET_NAME));
             this.addComponent('events');
-            this.sequence('moveStart', 'move');
-            this.sequence('moveEnd', 'idle');
+            this.addComponent('hexgrid');
+            this.moveDuration = 500;
+            // animation sequence
+            this.sequence('moveStart', 'move')
+                .sequence('moveEnd', 'idle')
+                .sequence('attack', 'idle');
+            // start with an animation
             this.play('idle');
+            // Keyframe animations
             this.on('hex.move.start', function(){
                 _this.play('moveStart');
             });
-            this.on('hex.move.end', function() {
+            // when the unit stops moving
+            this.on('hex.move.end', function(){
                 _this.play('moveEnd');
             });
-            //this.component(wol.components.events)
-            //    .component(
-            //        wol.components.animation,
-            //        wol.spritesheets.get(SHEET_NAME)
-            //    )
-            //this.play('idle');
-            //this.events.on('hex.move.start', function(){
-            //    console.log('heeey');
-            //});
+            // when the unit is told to attack
+            this.on('attack', function() {
+                _this.play('attack');
+            });
         }
     });
 });
