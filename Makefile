@@ -8,3 +8,7 @@ compile:
 
 server:
 	python -m SimpleHTTPServer 8080
+
+documentation:
+	docco src/wol/*.js
+	docco src/game/*.js

@@ -1,3 +1,8 @@
+// # Events
+// Creates an event manager which an object can subscribed to.
+// * * *
+
+//
 define([
 
     'wol/utils'

@@ -7,12 +7,9 @@ define([
 ], function(createjs, Events) {
     "use strict";
 
-    var createjs, wol;
+    var createjs, wol, wait;
 
-    var wait = function (ms, cb) {
-        return setTimeout(cb, ms);
-    }
-
+    // Shim for function binding.
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(oThis) {
             if (typeof this !== "function") {
@@ -31,39 +28,73 @@ define([
         };
     }
 
+    // ### wait
+    // Shortcut for setTimeout
+    wait = function (ms, cb) {
+        return setTimeout(cb, ms);
+    }
+
+
+    // ### createjs
+    // The rendering, preloading, and tween engine.
     createjs = window.createjs;
 
+    // # wol
+    // This namespace (and singleton) will be the central authority of the game.
     wol = {
+        // ### wol.components
+        // An API for component registration which is then used to apply to entities in the
+        // game.
         components: {
+            // #### wol.components._dictionary
             _dictionary: {},
+            // #### wol.components.add(name, function)
             add: function(name, component) {
                 if(!this._dictionary[name]) {
                     this._dictionary[name] = component;
                 }
                 return this;;w
             },
+            // #### wol.component.get(name)
+            // Retrieves the component if it exists.
             get: function(name) {
                 return this._dictionary[name];
             }
         },
+        // ### wol.display
+        // Used for adding display objects in the canvas which is then channeled
+        // towards the createjs.Stage instance.
         display: {
+            // #### wol.display.add(displayObject)
             add: function(displayObject) {
                 wol.stage.addChild(displayObject);
             }
         },
+        // ### wol.create
+        // A list of methods that deals with creating instaces of createjs classes like
+        // Bitmap, BitmapAnimation, Container, and caching.
         create: {
+            // #### wol.create.animation(spritesheet)
+            // returns a bitmap animation instance.
             animation: function (spritesheet) {
                 var animation = new createjs.BitmapAnimation(spritesheet);
                 return animation;
             },
+            // #### wol.create.container()
+            // returns a createjs.Container
             container: function() {
                 var container = new createjs.Container();
                 return container;
             },
+            // #### wol.create.bitmap(imageElement)
+            // returns a createjs.Bitmap instance
             bitmap: function(imageResource) {
                 var bitmap = new createjs.Bitmap(imageResource);
                 return bitmap;
             },
+            // #### wol.create.cache(displayObject, width, height)
+            // Caches an entire container to an offscreen canvas which is
+            // useful if you have a lot of static objects placed under a container.
             cache: function(displayObject, width, height) {
                 wol.debug('displayObject id: ' + displayObject.id + ' CACHING', width, height);
                 if (displayObject.cache) {
@@ -74,10 +105,18 @@ define([
             }
         },
 
+        // ### wol.events
+        // For easy event management.
         events: new Events(),
+        // ### wol.Events
+        // This property contains a list of events for this namespace.
         Events: {
+            // #### wol.Events.READY
+            // The event when the game finishes preloading assets.
             READY: 'wol.ready',
+            // #### wol.Events.PRELOAD_PROGRESS
             PRELOAD_PROGRESS: 'wol.preload.progress',
+            // #### wol.Events.GAME_START
             GAME_START: 'wol.game.start'
         },
 

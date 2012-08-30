@@ -1,14 +1,17 @@
+// # wol.Game
+// Game instances are responsible for managing entities inside a game session.
+// This is intended so that it's easier to create and switch between game instances.
+// * * *
+
+//
 define([
 
-    'wol/wol'
+       'wol/wol'
 
 ], function(wol) {
+
     "use strict";
 
-    // Game
-    // ----
-    // Game instances are responsible for managing entities inside a game session.
-    // This is intended so that it's easier to create and switch between game instances.
     return wol.Game = wol.Class.extend({
 
         init: function() {
