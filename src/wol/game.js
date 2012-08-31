@@ -25,7 +25,7 @@ define([
             if (objB === undefined) {
                 this.container.addChild(objA);
             } else if(objA) {
-                objA.addChild(objB);
+                objB.addChild(objA);
             }
             return this;
         }

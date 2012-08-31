@@ -5,6 +5,8 @@ define([
 
 ], function (wol, Events) {
 
+    "use strict";
+
     wol.KeyCodes = {
         MAC_ENTER: 3,
         BACKSPACE: 8,
@@ -77,12 +79,15 @@ define([
     wol.keys = {
         on: function(name, cb) {
             events.on(name, cb);
+            return this;
         },
         off: function(name, cb) {
             events.off(name, cb);
+            return this;
         },
         emit: function(name, data) {
             events.emit(name, data);
+            return this;
         }
     };
 

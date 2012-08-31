@@ -7,7 +7,8 @@ define([
     'game/entities/marine',
     'game/hex',
     'game/components/hexgrid',
-    'wol/keys'
+    'wol/keys',
+    'game/components/unit'
 
 ], function(wol, Game, HexGrid, elements, Marine, Hex) {
 
@@ -53,15 +54,17 @@ define([
             var i, _len, tile, hex, image, container, _this = this;
             image = wol.spritesheets.extract('elements','hex_bg');
             i = 0;
+            container = wol.create.container();
             this.showTiles(this.hexgrid.tiles, 'hex_bg', function(hex) {
-                _this.add(_this.hexContainer, hex);
+                _this.add(hex, container);
             });
             // Cache the hexTile container.
             // We wait for a tick before we cache it. Because sometimes
             // Chrome fails to render on initial load.
             wol.wait(0, function(){
-                wol.create.cache(this.hexContainer, wol.width, wol.height);
-            }.bind(this));
+                wol.create.cache(container, wol.width, wol.height);
+            });
+            this.add(container, this.hexContainer);
         },
 
         showTiles: function(tiles, type, callback) {
@@ -74,7 +77,7 @@ define([
                 hex = wol.create.bitmap(image);
                 Hex.position(hex, tile);
                 if (wol.isFunction(callback)) {
-                    callback.call(this, hex);
+                    callback.call(this, hex, i);
                 }
             }
             return hexes;
@@ -90,9 +93,27 @@ define([
             // place a unit immediately in a tile.
             entity.move(_this.hexgrid.get(5, 3));
             // showing movable tiles.
-            this.showTiles(this.hexgrid.neighbors(entity.tile, 2), 'hex_select', function(hex){
-                _this.add(_this.hexContainer, hex);
+            this.showTiles(this.hexgrid.neighbors(entity.tile, 2), 'hex_select', function(hex, i){
+                _this.add(hex, _this.hexContainer);
             });
+            // assign keys
+            var keys, KeyCodes;
+            keys = wol.keys;
+            KeyCodes = wol.KeyCodes;
+            keys
+                .on(KeyCodes.A, function(){
+                    entity.attack();
+                })
+                .on(KeyCodes.S, function(){
+                    entity.defend();
+                })
+                .on(KeyCodes.D, function(){
+                    entity.hit();
+                })
+                .on(KeyCodes.F, function () {
+                    entity.die();
+                })
+                ;
         },
 
         // This command will add the unit/entity into the proper container
@@ -101,7 +122,9 @@ define([
             // since this is a hex-grid game, we should apply a hexgrid component
             // to the entities we add into the display list.
             entity.addComponent('hexgrid');
-            this.add(this.unitContainer, entity.container);
+            entity.addComponent('unit');
+            console.log(entity);
+            this.add(entity.container, this.unitContainer);
         }
 
     });

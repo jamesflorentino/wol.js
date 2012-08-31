@@ -35,7 +35,11 @@ define([
             // animation sequence
             this.sequence('moveStart', 'move')
                 .sequence('moveEnd', 'idle')
-                .sequence('attack', 'idle');
+                .sequence('attack', 'idle')
+                .sequence('defendStart', 'defendHold')
+                .sequence('hit', 'defendHold')
+                .sequence('dieStart', 'dieEnd')
+                ;
             // start with an animation
             this.play('idle');
             // Keyframe animations
@@ -47,8 +51,17 @@ define([
                 _this.play('moveEnd');
             });
             // when the unit is told to attack
-            this.on('attack', function() {
+            this.on('unit.attack.start', function() {
                 _this.play('attack');
+            });
+            this.on('unit.defend.start', function() {
+                _this.play('defendStart');
+            });
+            this.on('unit.hit', function() {
+                _this.play('hit');
+            });
+            this.on('unit.die', function() {
+                _this.play('dieStart');
             });
         }
     });
