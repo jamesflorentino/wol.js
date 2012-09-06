@@ -1,65 +1,73 @@
 define([
+    'wol/wol',
+    'game/base',
+    'game/cookie'
 
-'wol/wol', 'game/base', 'game/api', 'game/cookie'
-
-], function(wol, Base, api, cookie) {
+], function(wol, Base, cookie) {
 
     "use strict";
 
     return Base.extend({
         socket: null,
-        /**
-         */
+        _players: {},
+        players: [],
+        player: {
+            name: null,
+            id: null
+        },
         init: function() {
             this.parent();
-            this.socket = io.connect('//localhost:1337');
             this.setEvents();
-            this.auth();
         },
-        /**
-         */
-        auth: function() {
-            this.socket
-                .emit('setup', { cookie: cookie.readCookie('wol-id') })
-                .emit('set_name', { name: 'James' })
-                .emit('find_game')
-                ;
-            return this;
-        },
-        /**
-         */
         setEvents: function() {
+            this.socket = io.connect('//localhost:3000/game');
             this.socket
-                .on('reconnect'  , this.reconnect.bind(this))
-                .on('disconnect' , this.disconnect.bind(this))
-                .on('set_user'   , this.setUser.bind(this))
-                .on('join_game'  , this.joinGame.bind(this))
-                .on('list_game' , this.listGame.bind(this))
-                ;
+                .on('disconnect', this.disconnect.bind(this))
+                .on('player.set', this.setPlayer.bind(this))
+                .on('players.add', this.addPlayer.bind(this))
+                .on('players.remove', this.removePlayer.bind(this))
+                .on('game.wait', this.waitGame.bind(this))
+                .on('game.start', this.startGame.bind(this))
+                .on('game.end', this.endGame.bind(this))
+                .emit('player.setAuth');
             return this;
+        }
+        addPlayer: function(data) {
+            var id = data.id;
+            var name = data.name;
+
+            if (id !== undefined && name !== undefined) {
+                var player = {
+                    id:id,
+                    name:name
+                };
+                this.players.push(player);
+                this._players[player.id] = player;
+            }
         },
-        /**
-         */
-        joinGame: function(data) {
+        removePlayer: function(data) {
+            var player, id;
+            id = data.id;
+            if(player = this._players[id]) {
+                delete this._players[id];
+                this.players.splice(this.players.indexOf(player), 1);
+            }
         },
-        /**
-         */
-        listGame: function(data) {
+        waitGame: function(data) {
+            console.log('waiting game', data);
         },
-        /**
-         */
-        setUser: function(data) {
-            cookie.createCookie('wol-id', data.key, 360);
+        startGame: function(data) {
+            console.log('starting game', data);
         },
-        /**
-         */
-        reconnect: function() {
-            console.log('reconnect');
+        endGame: function(data) {
+            console.log('ending game', data);
         },
-        /**
-         */
+        setPlayer: function(data) {
+            this.player.name = data.name;
+            this.player.id = data.id;
+            console.log('set player', data);
+        },
         disconnect: function () {
-            console.log('disconnect');
         }
     });
 
