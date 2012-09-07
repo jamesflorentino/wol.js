@@ -1,14 +1,19 @@
 define([
     'wol/wol',
     'game/base',
-    'game/cookie'
+    'cookies',
+    'lodash'
 
-], function(wol, Base, cookie) {
+], function(wol, Base, Cookies, _) {
 
     "use strict";
 
+    var vendorName = navigator.vendor.replace(/(^\w+).+/, function (a, b) {
+        return b;
+    });
+
     return Base.extend({
-        socket: null,
+        sio: null,
         _players: {},
         players: [],
         player: {
@@ -20,54 +25,34 @@ define([
             this.setEvents();
         },
         setEvents: function() {
-            this.socket = io.connect('//localhost:3000/game');
-            this.socket
-                .on('disconnect', this.disconnect.bind(this))
-                .on('player.set', this.setPlayer.bind(this))
-                .on('players.add', this.addPlayer.bind(this))
-                .on('players.remove', this.removePlayer.bind(this))
-                .on('game.wait', this.waitGame.bind(this))
-                .on('game.start', this.startGame.bind(this))
-                .on('game.end', this.endGame.bind(this))
-                .emit('player.setAuth');
+            this.sio = io.connect('//localhost:3000/game');
+            this.sio
+                .on('player.setData', this.setPlayerData.bind(this));
+            this.setAuthKey();
             return this;
-        }
-        addPlayer: function(data) {
+        },
+        setAuthKey: function() {
+            this.sio.emit('player.setAuthKey', {
+                wol_id: Cookies.get('wol_id')
+            });
+            return this;
+        },
+        setPlayerData: function(data) {
             var id = data.id;
-            var name = data.name;
-
-            if (id !== undefined && name !== undefined) {
-                var player = {
-                    id:id,
-                    name:name
-                };
-                this.players.push(player);
-                this._players[player.id] = player;
+            var authKey = data.authKey;
+            if (id && authKey) {
+                Cookies.set('wol_id', authKey, {
+                    expires: data.expiresIn
+                });
             }
+            this.setName();
+            this.findGame();
         },
-        removePlayer: function(data) {
-            var player, id;
-            id = data.id;
-            if(player = this._players[id]) {
-                delete this._players[id];
-                this.players.splice(this.players.indexOf(player), 1);
-            }
+        setName: function() {
+            this.sio.emit('player.setName', { name: vendorName });
         },
-        waitGame: function(data) {
-            console.log('waiting game', data);
-        },
-        startGame: function(data) {
-            console.log('starting game', data);
-        },
-        endGame: function(data) {
-            console.log('ending game', data);
-        },
-        setPlayer: function(data) {
-            this.player.name = data.name;
-            this.player.id = data.id;
-            console.log('set player', data);
-        },
-        disconnect: function () {
+        findGame: function() {
+            this.sio.emit('game.find');
         }
     });
 
