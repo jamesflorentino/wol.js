@@ -39,7 +39,6 @@ body {
     }
 
     #ui .preloader .bar {
-        background-color: #33aaa3;
         background-color: white;
         border-color: transparent;
         box-shadow: 0 0 10px 1px #33aaa3;
