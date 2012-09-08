@@ -6,7 +6,7 @@
 //
 define([
 
-       'wol/wol'
+    'wol/wol'
 
 ], function(wol) {
 

@@ -46,18 +46,21 @@ define([
             this.add(this.terrain);
             this.add(this.hexContainer);
             this.add(this.unitContainer);
-            this.hexgrid.generate(9,8);
+            this.hexgrid.generate(8,8);
             this.createStaticGridDisplay(this.hexgrid);
             this.terrain.y = this.hexContainer.y = this.unitContainer.y = 60;
         },
+
         addEntity: function(entity) {
             // since this is a hex-grid game, we should apply a hexgrid component
             // to the entities we add into the display list.
             entity.addComponent('hexgrid');
             entity.addComponent('unit');
+            entity.hide();
             this.add(entity.container, this.unitContainer);
             return this;
         },
+
         createStaticGridDisplay: function(grid) {
             var i, _len, tile, hex, image, container, _this = this;
             image = wol.spritesheets.extract('elements','hex_bg');

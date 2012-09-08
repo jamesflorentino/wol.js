@@ -36,6 +36,14 @@ define([
         // destroys the unit from the game
         entity.die = function(msg) {
             entity.emit('unit.die', msg);
+        };
+
+        entity.hide = function() {
+            entity.container.visible = false;
+        };
+
+        entity.show = function() {
+            entity.container.visible = true;
         }
     });
 
